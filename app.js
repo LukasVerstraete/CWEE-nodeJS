@@ -1,17 +1,24 @@
 var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
 
 var port = 3000;
 
-app.get('/', function(req, res) 
+var clients = new Object();
+
+server.listen(port, function() 
 {
-	res.send('<h1>Error 404</h1> <p>Page not found</p>')
+	console.log("Started listening on port: *:" + port);
 });
 
-io.on('connection', function(socket) 
-{
-	console.log('A user connected...');
+io.set('transports', 'websocket');
+
+io.sockets.on('connection', function(socket) 
+{	
+	socket.on('CONNECT', function(data) 
+	{
+		connect(socket, data);
+	});
 	
 	socket.on('disconnect', function() 
 	{
@@ -19,7 +26,17 @@ io.on('connection', function(socket)
 	});
 });
 
-http.listen(port, function() 
+function connect(socket, data)
 {
-	console.log("Started listening on port: *" + port);
-});
+	data.clientId = generateId();
+	clients[socket.id] = data;
+	console.log(data.username + ' has connected to the server...');
+	socket.emit('READY', clients[socket.id]);
+}
+
+function generateId(){
+	var S4 = function () {
+		return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+	};
+	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+}
