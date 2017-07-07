@@ -13,6 +13,8 @@ server.listen(port, function()
 
 io.set('transports', 'websocket');
 
+
+//defining sockets/////////////////////
 io.sockets.on('connection', function(socket) 
 {	
 	socket.on('CONNECT', function(data) 
@@ -23,12 +25,22 @@ io.sockets.on('connection', function(socket)
 	socket.on('disconnect', function() 
 	{
 		console.log('A user disconnected...');
+		delete clients[socket.id];
+	});
+	
+	socket.on('DISCONNECT', function(data) 
+	{
+		disconnect(socket, data);
 	});
 });
+///////////////////////////////////////
 
+//user authentication//////////////////
 function connect(socket, data)
 {
-	data.clientId = generateId();
+	if(!data.clientId)
+		data.clientId = generateId();
+	
 	clients[socket.id] = data;
 	console.log(data.username + ' has connected to the server...');
 	socket.emit('READY', clients[socket.id]);
@@ -40,3 +52,11 @@ function generateId(){
 	};
 	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
+
+function disconnect(socket, data)
+{
+	//TODO: close all user games etc.
+	delete clients[socket.id];
+	socket.emit('READY', null);
+}
+//////////////////////////////////////
