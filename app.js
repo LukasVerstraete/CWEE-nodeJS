@@ -1,6 +1,7 @@
 var app = require('express')();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
+var Game = require('./server/game.js');
 
 var port = 3000;
 
