@@ -49,7 +49,7 @@ function connect(socket, data)
 	
 	clients[socket.id] = data;
 	console.log(data.username + ' has connected to the server...');
-	socket.emit('READY', clients[socket.id]);
+	socket.emit('READY_CONNECT', clients[socket.id]);
 }
 
 function generateId(){
@@ -63,7 +63,7 @@ function disconnect(socket, data)
 {
 	//TODO: close all user games etc.
 	delete clients[socket.id];
-	socket.emit('READY', null);
+	socket.emit('READY_DISCONNECT', null);
 }
 //////////////////////////////////////
 
@@ -72,12 +72,7 @@ function disconnect(socket, data)
 function createGame(socket, data)
 {
 	Game.createGame(clients[socket.id], data);
-	
-}
-
-function broadcastGamesList()
-{
-	
+	socket.emit('READY_CREATE_GAME', Game.games[clients[socket.id].clientId]);
 }
 
 /////////////////////////////////////
