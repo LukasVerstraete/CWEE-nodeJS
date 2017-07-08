@@ -33,6 +33,11 @@ io.sockets.on('connection', function(socket)
 	{
 		disconnect(socket, data);
 	});
+	
+	socket.on('CREATE_GAME', function(data) 
+	{
+		createGame(socket, data);
+	});
 });
 ///////////////////////////////////////
 
@@ -61,3 +66,18 @@ function disconnect(socket, data)
 	socket.emit('READY', null);
 }
 //////////////////////////////////////
+
+//games///////////////////////////////
+
+function createGame(socket, data)
+{
+	Game.createGame(clients[socket.id], data);
+	
+}
+
+function broadcastGamesList()
+{
+	
+}
+
+/////////////////////////////////////
